@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Mini PC ESP32-S3 | Controle & Configurações</title>
+<style>
+
+</style>
+</head>
+<body>
+
+<header>MINI PC ESP32-S3</header>
+
+<div class="container">
+  <nav class="tabs">
+    <button class="tab-btn active" data-tab="status">Status</button>
+    <button class="tab-btn" data-tab="controle">Controle</button>
+    <button class="tab-btn" data-tab="config">Configurações</button>
+  </nav>
+
+  <section id="status" class="tab-content active">
+    <div class="status-list">
+      <p><span>🌡️ Temperatura</span> <span id="temp">-- °C</span></p>
+      <p><span>🌐 IP</span> <span id="ip">--</span></p>
+      <p><span>💡 LED Principal</span> <span id="ledState">--</span></p>
+      <p><span>🔵 BLE Ativo</span> <span id="ble">--</span></p>
+      <p><span>⏳ Uptime</span> <span id="uptime">--</span></p>
+      <p><span>📶 Wi-Fi RSSI</span> <span id="rssi">-- dBm</span></p>
+      <p><span>💾 Heap</span> <span id="heap">--</span></p>
+      <p><span>📀 Flash</span> <span id="flash">--</span></p>
+    </div>
+  </section>
+
+  <section id="controle" class="tab-content">
+    <div class="control-group">
+      <label for="ledToggle">💡 LED Principal</label>
+      <label class="switch" for="ledToggle">
+        <input type="checkbox" id="ledToggle" />
+        <span class="sliderSwitch"></span>
+      </label>
+      <label for="ledBrightness">Brilho do LED</label>
+      <input type="range" min="0" max="255" value="128" class="slider" id="ledBrightness" />
+      <label for="ledMode">Modo do LED</label>
+      <select id="ledMode" style="width: 100%; padding: 0.5rem; border-radius: 8px; background:#222; color:#00aaff; font-weight:700; margin-bottom: 1rem; border:none; box-shadow: inset 0 0 6px #0055ffbb;">
+        <option value="fixo">Fixo</option>
+        <option value="pisca_lento">Pisca Lento</option>
+        <option value="pisca_rapido">Pisca Rápido</option>
+        <option value="respiracao">Respiração</option>
+      </select>
+    </div>
+
+    <div class="control-group">
+      <label>💡 Cor do LED RGB</label>
+      <div id="colorPicker">
+        <canvas id="colorWheel" width="200" height="200"></canvas>
+        <div id="pickerCircle"></div>
+      </div>
+      <label id ="rgb">[<span id="red">255</span>, <span id="green">255</span>, <span id="blue">255</span>]</label>
+    </div>
+
+    <div class="control-group">
+      <label>⚙️ Motor</label>
+      <button class="btn-small" id="motorToggle">Ligar Motor</button>
+      <label for="motorSpeed">Velocidade do Motor</label>
+      <input type="range" min="0" max="255" value="128" class="slider" id="motorSpeed" />
+      <div style="margin-top: 0.5rem;">
+        <label for="motorTimer">Tempo ligado (segundos)</label>
+        <input type="number" id="motorTimer" min="1" max="60" value="5" />
+        <button class="btn-small" id="motorTimerStart">Iniciar Timer</button>
+      </div>
+      <div style="margin-top: 0.8rem;">
+        <button class="btn-small" id="motorInvert">Inverter Sentido</button>
+      </div>
+    </div>
+
+    <div class="control-group">
+      <label>🔔 Buzzer</label>
+      <button class="btn-small" id="buzzerToggle">Ligar Buzzer</button>
+      <label for="volumeControl">🔊 Volume</label>
+      <input type="range" min="0" max="100" value="50" class="slider" id="volumeControl" />
+      <label for="buzzerTone">Tom do Buzzer</label>
+      <select id="buzzerTone" style="width: 100%; padding: 0.5rem; border-radius: 8px; background:#222; color:#00aaff; font-weight:700; margin: 0.5rem 0 1rem 0; border:none; box-shadow: inset 0 0 6px #0055ffbb;">
+        <option value="tom_simples">Tom Simples</option>
+        <option value="mario">Mario</option>
+        <option value="melodia">Melodia</option>
+        <option value="melodia2">Melodia 2</option>
+        <option value="sirene">Sirene</option>
+      </select>
+      <button class="btn-small" id="buzzerTest">Testar Som</button>
+    </div>
+
+    <div class="control-group">
+      <label>Sensores e Botões</label>
+      <p>BOTÃO 1: <span id="btn1Status" class="status-indicator">--</span></p>
+      <p>BOTÃO 2: <span id="btn2Status" class="status-indicator">--</span></p>
+      <p>BOTÃO 3: <span id="btn3Status" class="status-indicator">--</span></p>
+      <p>Temperatura Atual: <span id="sensorTemp">-- °C</span></p>
+    </div>
+
+    <div class="control-group">
+      <button id="resetBtn">Resetar Sistema</button>
+    </div>
+  </section>
+
+  <section id="config" class="tab-content">
+    <div class="control-group">
+      <label>🌐 Wi-Fi</label>
+      <p>SSID Atual: <span id="wifiSSID">--</span></p>
+      <p>Força do Sinal: <span id="wifiRSSI">-- dBm</span></p>
+      <button class="btn-small" id="wifiReset">Resetar Wi-Fi</button>
+    </div>
+
+    <div class="control-group">
+      <label>🔵 Bluetooth BLE</label>
+      <label class="switch" for="bleToggle">
+        <input type="checkbox" id="bleToggle" />
+        <span class="sliderSwitch"></span>
+      </label>
+      <label for="bleName">Nome do Dispositivo</label>
+      <input type="text" id="bleName" placeholder="MINI PC" style="width: 100%; padding: 0.5rem; border-radius: 8px; background:#222; color:#00aaff; font-weight:700; border:none; box-shadow: inset 0 0 6px #0055ffbb; margin-bottom: 1rem;" />
+      <label for="bleVisibility">Visibilidade</label>
+      <select id="bleVisibility" style="width: 100%; padding: 0.5rem; border-radius: 8px; background:#222; color:#00aaff; font-weight:700; margin-bottom: 1rem; border:none; box-shadow: inset 0 0 6px #0055ffbb;">
+        <option value="visivel">Visível</option>
+        <option value="invisivel">Invisível</option>
+      </select>
+      <button class="btn-small" id="bleApply">Aplicar Configurações BLE</button>
+    </div>
+
+    <div class="control-group">
+      <label>💡 LED</label>
+      <label for="configLedBrightness">Brilho (PWM)</label>
+      <input type="range" min="0" max="255" value="128" class="slider" id="configLedBrightness" />
+      <label for="configLedMode">Modo</label>
+      <select id="configLedMode" style="width: 100%; padding: 0.5rem; border-radius: 8px; background:#222; color:#00aaff; font-weight:700; margin-bottom: 1rem; border:none; box-shadow: inset 0 0 6px #0055ffbb;">
+        <option value="fixo">Fixo</option>
+        <option value="pisca_lento">Pisca Lento</option>
+        <option value="pisca_rapido">Pisca Rápido</option>
+        <option value="respiracao">Respiração</option>
+      </select>
+      <button class="btn-small" id="configLedApply">Aplicar Configurações LED</button>
+    </div>
+  </section>
+ 
+</div>
+
+<script>
+</script>
+
+</body>
+</html>
